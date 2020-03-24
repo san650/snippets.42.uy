@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<meta charset="UTF-8">
+<body>
+<main>
+<h1>Snippets</h1>
+</main>
+<script>
+	let hash = text => text.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')
+	let mapBy = (attr, mappings) => collection => {
+		collection.forEach(obj => {
+			let key = obj[attr]
+			if (key && mappings[key])
+				mappings[key](obj)
+			else
+				mappings['default'](obj)
+		})
+		return collection;
+	};
+	let append = (target, type) => {
+		let element = target.ownerDocument.createElement(type)
+		target.appendChild(element)
+		return element
+	}
+	let render = (target, funcs) => (...arguments) => {
+		let article = append(target, 'article')
+		funcs.forEach(f => f(article)(...arguments))
+		return article;
+	}
+	let error = (target, notes) => error => {
+		append(target, 'p').innerText = notes
+		append(target, 'p').innerText = error
+	}
+	let renderTitle = target => ({title}) => {
+		let h2 = append(target, 'h2');
+		append(h2, 'span').innerText = title;
+		let anchor = append(h2, 'a')
+		anchor.innerText = '¶'
+		anchor.name = hash(title)
+		anchor.href = `#${anchor.name}`
+	}
+	let renderText = target => ({blob}) => {
+		append(target, 'p').innerText = blob
+	}
+	let renderHtml = target => ({blob}) => {
+		append(target, 'p').innerHTML = blob
+	}
+	let renderShell = target => ({blob}) => {
+		let code = append(append(target, 'p'), 'code')
+		code.innerHTML = blob
+		code.classList.add('sh');
+	}
+	let debug = message => x => {
+		console.log([message, x])
+		return x;
+	}
+
+	var target = document.getElementsByTagName('main')[0];
+
+	fetch('./snippets.json')
+		.then(debug('fetch'))
+		.then(r => r.json())
+		.then(debug('json'))
+		.then(d => d.snippets)
+		.then(debug('map'))
+		.then(mapBy('contentType', {
+			'text/plain': render(target, [renderTitle, renderText]),
+			'text/html': render(target, [renderTitle, renderHtml]),
+			'application/x-sh': render(target, [renderTitle, renderShell])
+			}
+		))
+		.then(debug('render'))
+		.catch(error(target, 'Error fetching snippets.json file'))
+</script>
+<style>
+:root{
+	font-size:14px;
+	line-height:1;
+}
+h2 {font-size:inherit;padding:0 0 .8rem;margin:1.5rem 0 0}
+p {margin:0;padding:0}
+kdb {
+background-color: #eee;
+border-radius: .2rem;
+border: 1px solid #b4b4b4;
+box-shadow: 0 1px 1px rgba(0, 0, 0, .2), 0 2px 0 0 rgba(255, 255, 255, .7) inset;
+color: #333;
+display: inline-block;
+padding: .2rem .3rem;
+white-space: nowrap;
+}
+h2 a{
+display:inline-block;
+margin-left: 1rem;
+color: #ccc;
+font-size: 1.2rem;
+text-decoration: none;
+font-family: monospace;
+}
+h2 a:hover{
+color: #777;
+}
+.sh:before{display:inline-block;content: "$";margin-right:.5rem}
+</style>

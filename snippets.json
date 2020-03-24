@@ -1,0 +1,24 @@
+{
+	"snippets": [
+		{
+			"title": "json pretty print",
+			"blob": "python -m json.tool < source.json > out.json",
+			"contentType": "application/x-sh"
+		},
+		{
+			"title": "local dev server",
+			"blob": "python -m SimpleHTTPServer",
+			"contentType": "application/x-sh"
+		},
+		{
+			"title": "vim - move between wrapped lines",
+			"blob": "Down <kdb>gj</kdb> and Up <kdb>gk</kdb>",
+			"contentType": "text/html"
+		},
+		{
+			"title": "vim - terminal normal mode",
+			"blob": "Enter Terminal-Normal mode <kdb>&lt;CTRL-W&gt; N</kdb> and <kdb>i</kdb> to enter Terminal-Insert mode",
+			"contentType": "text/html"
+		}
+	]
+}
