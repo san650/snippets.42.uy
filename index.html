@@ -38,13 +38,13 @@
 		anchor.name = hash(title)
 		anchor.href = `#${anchor.name}`
 	}
-	let renderText = target => ({blob}) => {
+	let renderBlobAsText = target => ({blob}) => {
 		append(target, 'p').innerText = blob
 	}
-	let renderHtml = target => ({blob}) => {
+	let renderBlobAsHtml = target => ({blob}) => {
 		append(target, 'p').innerHTML = blob
 	}
-	let renderShell = target => ({blob}) => {
+	let renderBlobAsShell = target => ({blob}) => {
 		let code = append(append(target, 'p'), 'code')
 		code.innerHTML = blob
 		code.classList.add('sh');
@@ -63,9 +63,9 @@
 		.then(d => d.snippets)
 		.then(debug('map'))
 		.then(mapBy('contentType', {
-			'text/plain': render(target, [renderTitle, renderText]),
-			'text/html': render(target, [renderTitle, renderHtml]),
-			'application/x-sh': render(target, [renderTitle, renderShell])
+			'text/plain': render(target, [renderTitle, renderBlobAsText]),
+			'text/html': render(target, [renderTitle, renderBlobAsHtml]),
+			'application/x-sh': render(target, [renderTitle, renderBlobAsShell])
 			}
 		))
 		.then(debug('render'))
