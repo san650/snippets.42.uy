@@ -7,7 +7,6 @@
 <input id=term placeholder='Type to search…'>
 </div>
 </main>
-<script src="minisearch.js"></script>
 <script>
 	let hash = text => text.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')
 	let each = (cb) => collection => {
@@ -81,10 +80,22 @@
 		.then(snippets => (index = setupSearch(snippets), snippets))
 		.catch(error(target, 'Error fetching snippets.json file'))
 
+function createIndex({fields}) {
+	let index = [];
+	return {
+		addAll: data => {
+			data.forEach(d =>
+				index.push([String(d.id), fields.map(f => 
+							d[f]).join('|')]))
+console.log(index)
+},
+		search: t => (term = t.trim(), 
+			index.reduce((results, current) => current[1].includes(term) ? [current, ...results] : results, []).map(r => r[0]))
+		}
+}
 function setupSearch(snippets) {
-	let index = new MiniSearch({
-		fields: ['title', 'blob', 'notes'],
-		storeFields: ['id']
+	let index = createIndex({
+		fields: ['title', 'blob', 'notes']
 	})
 	index.addAll(snippets)
 	return index
@@ -92,7 +103,7 @@ function setupSearch(snippets) {
 
 document.getElementById('term').addEventListener('input', event => {
 	let term = event.currentTarget.value
-	let results = index.search(term).map(r => String(r.id))
+	let results = index.search(term)
 	let articles = Array.from(document.getElementsByTagName('article'))
 	if (term)
 		articles.forEach(article =>
