@@ -7,7 +7,7 @@
 <input id=term placeholder='Type to search…'>
 </div>
 </main>
-<script src="lunr.js"></script>
+<script src="minisearch.js"></script>
 <script>
 	let hash = text => text.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')
 	let each = (cb) => collection => {
@@ -82,22 +82,23 @@
 		.catch(error(target, 'Error fetching snippets.json file'))
 
 function setupSearch(snippets) {
-	// lunr.js
-	return lunr(function () {
-		this.field('title')
-		this.field('blob')
-		this.field('notes')
-		this.ref('id')
-		snippets.forEach(s => this.add(s))
+	let index = new MiniSearch({
+		fields: ['title', 'blob', 'notes'],
+		storeFields: ['id']
 	})
+	index.addAll(snippets)
+	return index
 }
 
 document.getElementById('term').addEventListener('input', event => {
 	let term = event.currentTarget.value
-console.log(term)
-	let results = index.search(term).map(r => r.ref)
-	Array.from(document.getElementsByTagName('article')).forEach(article =>
-			results.includes(article.dataset.id) ? article.classList.remove('miss') : article.classList.add('miss')
+	let results = index.search(term).map(r => String(r.id))
+	let articles = Array.from(document.getElementsByTagName('article'))
+	if (term)
+		articles.forEach(article =>
+			results.includes(article.dataset.id) ? article.classList.remove('miss') : article.classList.add('miss'))
+	else
+		articles.forEach(article => article.classList.remove('miss')
 	)
 }, false);
 </script>
