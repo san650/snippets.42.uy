@@ -1,9 +1,7 @@
 <!DOCTYPE HTML>
 <meta charset="UTF-8">
 <body>
-<main>
-<h1>Snippets</h1>
-</main>
+<main><h1>Snippets</h1></main>
 <script>
 	let hash = text => text.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')
 	let mapBy = (attr, mappings) => collection => {
@@ -11,8 +9,7 @@
 			let key = obj[attr]
 			if (key && mappings[key])
 				mappings[key](obj)
-			else
-				mappings['default'](obj)
+			else throw new Error(`[Fail Fast]: The content type "${key}" is not supported by the app.`)
 		})
 		return collection;
 	};
@@ -38,8 +35,14 @@
 		anchor.name = hash(title)
 		anchor.href = `#${anchor.name}`
 	}
+	let renderNotes = target => ({notes}) => {
+		if (!notes) return
+
+		append(target, 'blockquote').innerText = notes; 
+	}
 	let renderBlobAsText = target => ({blob}) => {
-		append(target, 'p').innerText = blob
+		let code = append(append(target, 'p'), 'code')
+		code.innerHTML = blob
 	}
 	let renderBlobAsHtml = target => ({blob}) => {
 		append(target, 'p').innerHTML = blob
@@ -63,21 +66,32 @@
 		.then(d => d.snippets)
 		.then(debug('map'))
 		.then(mapBy('contentType', {
-			'text/plain': render(target, [renderTitle, renderBlobAsText]),
-			'text/html': render(target, [renderTitle, renderBlobAsHtml]),
-			'application/x-sh': render(target, [renderTitle, renderBlobAsShell])
+			'text/plain': render(target, [renderTitle, renderBlobAsText, renderNotes]),
+			'text/html': render(target, [renderTitle, renderBlobAsHtml, renderNotes]),
+			'application/x-sh': render(target, [renderTitle, renderBlobAsShell, renderNotes])
 			}
 		))
 		.then(debug('render'))
+		.then(() => {
+			// Because snippets are rendered after DOMContentLoaded event happens, `:target` css rules are not applied to the generated DOM elements. We workaround this by triggering a same-page navigation by re-applying the hash to the URL.
+			if (location.hash)
+				location = `${location.hash}`
+		})
 		.catch(error(target, 'Error fetching snippets.json file'))
 </script>
 <style>
 :root{
-	font-size:14px;
-	line-height:1;
+font-size:14px;
+line-height:1;
 }
-h2 {font-size:inherit;padding:0 0 .8rem;margin:1.5rem 0 0}
-p {margin:0;padding:0}
+h2 {
+font-size:inherit;
+padding:16px 0;
+margin:1.5rem 0 0;
+color: #745fb5;
+font-size:19px;
+font-weight: 400;
+}
 kdb {
 background-color: #eee;
 border-radius: .2rem;
@@ -87,17 +101,64 @@ color: #333;
 display: inline-block;
 padding: .2rem .3rem;
 white-space: nowrap;
+font-family: monospace;
 }
 h2 a{
 display:inline-block;
 margin-left: 1rem;
 color: #ccc;
-font-size: 1.2rem;
+font-size: 1.5rem;
 text-decoration: none;
 font-family: monospace;
+outline: none;
 }
 h2 a:hover{
 color: #777;
 }
 .sh:before{display:inline-block;content: "$";margin-right:.5rem}
+
+html, body {
+background:#f1f3f5;
+font-family: -apple-system,BlinkMacSystemFont,segoe ui,roboto,oxygen,ubuntu,cantarell,fira sans,droid sans,helvetica neue,sans-serif;
+font-size: 14px;
+line-height: 1.6;
+color: #345;
+}
+main {
+width: 100%;
+max-width: 760px;
+margin: 0 auto;
+}
+article {
+border-radius: 2px;
+}
+blockquote {
+background: #f8f9fa;
+color: #678;	
+margin:0;
+padding:16px;
+box-shadow: 0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3);	
+}
+article p{
+margin: 0;
+padding: 0;
+background: #fff;
+padding:16px;
+box-shadow: 0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3);	
+}
+h1 {
+font-size: 49px;
+line-height: 1.2;
+font-weight: 200;
+font-family: -apple-system,BlinkMacSystemFont,segoe ui,roboto,oxygen,ubuntu,cantarell,fira sans,droid sans,helvetica neue,sans-serif;
+margin: 0;
+text-align:center;
+}
+:target:after {
+display: inline-block;
+content: "⟵  👀";
+color: #777;
+margin-left: 10px;
+font-size: 2rem;
+}
 </style>

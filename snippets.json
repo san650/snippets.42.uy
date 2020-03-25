@@ -19,6 +19,12 @@
 			"title": "vim - terminal normal mode",
 			"blob": "Enter Terminal-Normal mode <kdb>&lt;CTRL-W&gt; N</kdb> and <kdb>i</kdb> to enter Terminal-Insert mode",
 			"contentType": "text/html"
+		},
+		{
+			"title": "vim - mappings",
+			"blob": "nnoremap <silent> ,<space> :nohlsearch<CR>",
+			"contentType": "text/plain",
+			"notes": "Everytime I press `,` then `<space>` in normal mode, please type the following command `:nohlsearch` and please finish with Enter `<CR>` to execute the command. But…hey! Attention! I don't want the command to be echoed on command line!… and there's more…I don't want it to be recursive so, if I'm saving another key mapping in the future and I write the sequence `,<space>` on the right hand side, it's not supposed to call `:nohlsearch` again, it's supposed to refer to the original behavior of the `,` then `<space>` keys."
 		}
 	]
 }
