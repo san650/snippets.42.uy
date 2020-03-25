@@ -1,33 +1,36 @@
 <!DOCTYPE HTML>
 <meta charset="UTF-8">
 <body>
-<main><h1>Snippets</h1></main>
+<main>
+<h1>Snippets</h1>
+<div style="text-align:right">
+<input id=term placeholder='Type to search…'>
+</div>
+</main>
+<script src="lunr.js"></script>
 <script>
 	let hash = text => text.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')
-	let mapBy = (attr, mappings) => collection => {
-		collection.forEach(obj => {
-			let key = obj[attr]
-			if (key && mappings[key])
-				mappings[key](obj)
-			else throw new Error(`[Fail Fast]: The content type "${key}" is not supported by the app.`)
-		})
-		return collection;
+	let each = (cb) => collection => {
+		collection.forEach(cb)
+		return collection
 	};
 	let append = (target, type) => {
 		let element = target.ownerDocument.createElement(type)
 		target.appendChild(element)
 		return element
 	}
-	let render = (target, funcs) => (...arguments) => {
+	let render = (target) => (snippet) => {
 		let article = append(target, 'article')
-		funcs.forEach(f => f(article)(...arguments))
-		return article;
+		article.dataset.id = snippet.id
+		renderTitle(article, snippet)
+		renderBlob(article, snippet)
+		renderNotes(article, snippet)
 	}
 	let error = (target, notes) => error => {
 		append(target, 'p').innerText = notes
 		append(target, 'p').innerText = error
 	}
-	let renderTitle = target => ({title}) => {
+	let renderTitle = (target, {title}) => {
 		let h2 = append(target, 'h2');
 		append(h2, 'span').innerText = title;
 		let anchor = append(h2, 'a')
@@ -35,49 +38,68 @@
 		anchor.name = hash(title)
 		anchor.href = `#${anchor.name}`
 	}
-	let renderNotes = target => ({notes}) => {
+	let renderNotes = (target, {notes}) => {
 		if (!notes) return
 
 		append(target, 'blockquote').innerText = notes; 
 	}
-	let renderBlobAsText = target => ({blob}) => {
+	let renderBlobAsText = (target, {blob}) => {
 		let code = append(append(target, 'p'), 'code')
 		code.innerHTML = blob
 	}
-	let renderBlobAsHtml = target => ({blob}) => {
+	let renderBlobAsHtml = (target, {blob}) => {
 		append(target, 'p').innerHTML = blob
 	}
-	let renderBlobAsShell = target => ({blob}) => {
+	let renderBlobAsShell = (target, {blob}) => {
 		let code = append(append(target, 'p'), 'code')
 		code.innerHTML = blob
 		code.classList.add('sh');
 	}
-	let debug = message => x => {
-		console.log([message, x])
-		return x;
+	let renderBlob = (target, snippet) => {
+		let {contentType} = snippet;
+		switch(contentType) {
+			case 'text/plain': renderBlobAsText(target, snippet); break
+			case 'text/html': renderBlobAsHtml(target, snippet); break
+			case 'application/x-sh': renderBlobAsShell(target, snippet); break
+		}
 	}
 
 	var target = document.getElementsByTagName('main')[0];
+	var index;
 
 	fetch('./snippets.json')
-		.then(debug('fetch'))
 		.then(r => r.json())
-		.then(debug('json'))
 		.then(d => d.snippets)
-		.then(debug('map'))
-		.then(mapBy('contentType', {
-			'text/plain': render(target, [renderTitle, renderBlobAsText, renderNotes]),
-			'text/html': render(target, [renderTitle, renderBlobAsHtml, renderNotes]),
-			'application/x-sh': render(target, [renderTitle, renderBlobAsShell, renderNotes])
-			}
-		))
-		.then(debug('render'))
-		.then(() => {
+		.then(each((s, i) => s.id = i))
+		.then(each(render(target)))
+		.then(snippets => {
 			// Because snippets are rendered after DOMContentLoaded event happens, `:target` css rules are not applied to the generated DOM elements. We workaround this by triggering a same-page navigation by re-applying the hash to the URL.
 			if (location.hash)
 				location = `${location.hash}`
+			return snippets;
 		})
+		.then(snippets => (index = setupSearch(snippets), snippets))
 		.catch(error(target, 'Error fetching snippets.json file'))
+
+function setupSearch(snippets) {
+	// lunr.js
+	return lunr(function () {
+		this.field('title')
+		this.field('blob')
+		this.field('notes')
+		this.ref('id')
+		snippets.forEach(s => this.add(s))
+	})
+}
+
+document.getElementById('term').addEventListener('input', event => {
+	let term = event.currentTarget.value
+console.log(term)
+	let results = index.search(term).map(r => r.ref)
+	Array.from(document.getElementsByTagName('article')).forEach(article =>
+			results.includes(article.dataset.id) ? article.classList.remove('miss') : article.classList.add('miss')
+	)
+}, false);
 </script>
 <style>
 :root{
@@ -160,5 +182,15 @@ content: "⟵  👀";
 color: #777;
 margin-left: 10px;
 font-size: 2rem;
+}
+.miss {
+opacity: .3;
+}
+#term {
+width:200px;
+border: 1px solid #ddd;
+padding: .5rem 1rem;
+line-height: 1.5rem;
+font-size: 1.3rem;
 }
 </style>
