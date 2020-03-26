@@ -1,11 +1,37 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <meta charset="UTF-8">
 <body>
 <main>
 <h1>Snippets</h1>
-<div style="text-align:right">
+<form id=search>
+<output id=results></output>
 <input id=term placeholder='Type to search…'>
-</div>
+<button id=clear type=reset>⤫</button>
+</form>
+<style>
+form {
+display: flex;
+justify-content: flex-end;
+}
+#term {
+width:200px;
+padding: .5rem 1rem;
+line-height: 1.5rem;
+font-size: 1.3rem;
+border: 1px solid #ddd;
+border-right: none;
+}
+#clear {
+background:white;
+border: 1px solid #ddd;
+border-left: none;
+cursor:pointer;
+}
+#results {
+align-self: center;
+margin-right: 1rem;
+}
+</style>
 </main>
 <script>
 	let hash = text => text.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')
@@ -105,18 +131,32 @@ document.getElementById('term').addEventListener('input', event => {
 	let term = event.currentTarget.value
 	let results = index.search(term)
 	let articles = Array.from(document.getElementsByTagName('article'))
+
 	if (term)
 		articles.forEach(article =>
 			results.includes(article.dataset.id) ? article.classList.remove('miss') : article.classList.add('miss'))
 	else
 		articles.forEach(article => article.classList.remove('miss')
 	)
+
+	document.forms.search.elements.results.value = term.length ? `Found ${results.length} matches` : '';
 }, false);
+
+document.getElementById('clear').addEventListener('click', event => {
+	document.forms.search.elements.term.value = '';
+	document.forms.search.elements.term.dispatchEvent(new Event('input'));
+}, false)
+document.getElementById('search').addEventListener('submit', event => {
+	event.preventDefault();
+});
 </script>
 <style>
-:root{
-font-size:14px;
-line-height:1;
+html, body {
+background:#f1f3f5;
+font-family: -apple-system,BlinkMacSystemFont,segoe ui,roboto,oxygen,ubuntu,cantarell,fira sans,droid sans,helvetica neue,sans-serif;
+font-size: 14px;
+line-height: 1.6;
+color: #345;
 }
 h2 {
 font-size:inherit;
@@ -124,7 +164,7 @@ padding:16px 0;
 margin:1.5rem 0 0;
 color: #745fb5;
 font-size:19px;
-font-weight: 400;
+font-weight: 300;
 }
 kdb {
 background-color: #eee;
@@ -151,13 +191,6 @@ color: #777;
 }
 .sh:before{display:inline-block;content: "$";margin-right:.5rem}
 
-html, body {
-background:#f1f3f5;
-font-family: -apple-system,BlinkMacSystemFont,segoe ui,roboto,oxygen,ubuntu,cantarell,fira sans,droid sans,helvetica neue,sans-serif;
-font-size: 14px;
-line-height: 1.6;
-color: #345;
-}
 main {
 width: 100%;
 max-width: 760px;
@@ -196,13 +229,6 @@ margin-left: 10px;
 font-size: 2rem;
 }
 .miss {
-opacity: .3;
-}
-#term {
-width:200px;
-border: 1px solid #ddd;
-padding: .5rem 1rem;
-line-height: 1.5rem;
-font-size: 1.3rem;
+display: none;
 }
 </style>
