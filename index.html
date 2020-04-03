@@ -1,25 +1,36 @@
 <!DOCTYPE html>
 <meta charset="UTF-8">
+<meta name="viewport" content="initial-scale=1.0">
 <body>
 <main>
 <h1>Snippets</h1>
 <form id=search>
-<output id=results></output>
+<div class=fieldset>
 <input id=term placeholder='Type to search…'>
 <button id=clear type=reset>⤫</button>
+</div>
+<output id=results></output>
 </form>
 <style>
 form {
 display: flex;
+flex-direction: column;
+align-items: stretch;
+}
+.fieldset {
+border: none;
+padding: 0;
+margin: 0;
+display: flex;
 justify-content: flex-end;
 }
 #term {
-width:200px;
 padding: .5rem 1rem;
 line-height: 1.5rem;
 font-size: 1.3rem;
 border: 1px solid #ddd;
 border-right: none;
+flex: 1 1 auto;
 }
 #clear {
 background:white;
@@ -66,7 +77,7 @@ margin-right: 1rem;
 	let renderNotes = (target, {notes}) => {
 		if (!notes) return
 
-		append(target, 'blockquote').innerText = notes; 
+		append(target, 'blockquote').innerText = notes;
 	}
 	let renderBlobAsText = (target, {blob}) => {
 		let code = append(append(target, 'p'), 'code')
@@ -151,12 +162,16 @@ document.getElementById('search').addEventListener('submit', event => {
 });
 </script>
 <style>
+* {
+box-sizing:border-box;
+}
 html, body {
 background:#f1f3f5;
 font-family: -apple-system,BlinkMacSystemFont,segoe ui,roboto,oxygen,ubuntu,cantarell,fira sans,droid sans,helvetica neue,sans-serif;
 font-size: 14px;
 line-height: 1.6;
 color: #345;
+margin: 0;
 }
 h2 {
 font-size:inherit;
@@ -201,17 +216,17 @@ border-radius: 2px;
 }
 blockquote {
 background: #f8f9fa;
-color: #678;	
+color: #678;
 margin:0;
 padding:16px;
-box-shadow: 0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3);	
+box-shadow: 0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3);
 }
 article p{
 margin: 0;
 padding: 0;
 background: #fff;
 padding:16px;
-box-shadow: 0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3);	
+box-shadow: 0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3);
 }
 h1 {
 font-size: 49px;
