@@ -25,6 +25,17 @@
       "blob": "nnoremap <silent> ,<space> :nohlsearch<CR>",
       "contentType": "text/plain",
       "notes": "Everytime I press `,` then `<space>` in normal mode, please type the following command `:nohlsearch` and please finish with Enter `<CR>` to execute the command. But…hey! Attention! I don't want the command to be echoed on command line!… and there's more…I don't want it to be recursive so, if I'm saving another key mapping in the future and I write the sequence `,<space>` on the right hand side, it's not supposed to call `:nohlsearch` again, it's supposed to refer to the original behavior of the `,` then `<space>` keys."
+    },
+    {
+      "title": "vim - rename buffer",
+      "blob": ":f! my-awesome-name.txt",
+      "contentType": "text/plain",
+      "notes": "_Longhand_ name of the command is `:file_f`"
+    },
+    {
+      "title": "elixir - run seeds files from umbrella",
+      "blob": "for i in $(find . -name seeds.exs); do mix run $i; done",
+      "contentType": "application/x-sh"
     }
   ]
 }
