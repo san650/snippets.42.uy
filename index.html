@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="initial-scale=1.0">
+<head><title>Snippets</title></head>
 <body>
-<main>
-<h1>Snippets</h1>
+<header>
 <form id=search>
-<div class=fieldset>
-<input id=term placeholder='Type to search…'>
-<button id=clear type=reset>⤫</button>
-</div>
-<output id=results></output>
+  <div class=fieldset>
+    <input id=term placeholder='Type to search…'>
+    <button id=clear type=reset>⤫</button>
+  </div>
+  <output id=results></output>
 </form>
+</header>
+<main>
 <style>
+header {
+  position:sticky;
+  top: 0;
+  background:#f1f3f5;
+  box-shadow: 0 0px 10px rgba(0, 0, 0, .2);
+  padding: 10px 0;
+}
 form {
+max-width: 760px;
+margin: 0 auto;
 display: flex;
 flex-direction: column;
 align-items: stretch;
@@ -42,6 +53,14 @@ cursor:pointer;
 align-self: center;
 margin-right: 1rem;
 }
+/*
+output {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(255, 220, 0, .3);
+  padding: 5px 7px;
+}
+*/
 </style>
 </main>
 <script>
@@ -227,14 +246,6 @@ padding: 0;
 background: #fff;
 padding:16px;
 box-shadow: 0 6px 8px rgba(102,119,136,.03), 0 1px 2px rgba(102,119,136,.3);
-}
-h1 {
-font-size: 49px;
-line-height: 1.2;
-font-weight: 200;
-font-family: -apple-system,BlinkMacSystemFont,segoe ui,roboto,oxygen,ubuntu,cantarell,fira sans,droid sans,helvetica neue,sans-serif;
-margin: 0;
-text-align:center;
 }
 :target:after {
 display: inline-block;
