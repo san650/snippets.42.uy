@@ -36,6 +36,16 @@
       "title": "elixir - run seeds files from umbrella",
       "blob": "for i in $(find . -name seeds.exs); do mix run $i; done",
       "contentType": "application/x-sh"
+    },
+    {
+      "title": "tidy an HTML document with tidy",
+      "blob": "tidy -mi -xml -wrap 0 doc.html",
+      "contentType": "application/x-sh"
+    },
+    {
+      "title": "vim - tidy an HTML document",
+      "blob": ":!tidy -mi -xml -wrap 0 %",
+      "contentType": "application/x-sh"
     }
   ]
 }
